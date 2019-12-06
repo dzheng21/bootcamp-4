@@ -1,4 +1,7 @@
+-- Derek Zheng 12/2019
 gui = {}
+bestScore = 0;
+currentScore = 0;
 
 function love.load()
     gridXCount = 40;
@@ -41,7 +44,12 @@ function love.load()
         end
 
         foodPosition = possibleFoodPositions[love.math.random(1, #possibleFoodPositions)]
+        extraFood = possibleFoodPositions[love.math.random(1, #possibleFoodPositions)]
+        deathbox = possibleFoodPositions[love.math.random(1, #possibleFoodPositions)]
+
     end
+
+
 
     moveFood();
 
@@ -57,6 +65,7 @@ function love.load()
         timer = 0;
         gui.timer = 0;
         gameTimer = 0;
+        currentScore = 0;
 
         moveFood();       
     end
@@ -133,8 +142,24 @@ function love.update(dt)
 
                 if snakeSegments[1].x == foodPosition.x
                 and snakeSegments[1].y == foodPosition.y then
+                    currentScore = currentScore+1;
+                    if(currentScore > bestScore) then
+                        bestScore = currentScore;
+                    end
                     moveFood();
                 else
+                    if snakeSegments[1].x == extraFood.x and snakeSegments[1].y == extraFood.y then
+                        currentScore= currentScore +5;
+                        if(currentScore > bestScore) then
+                            bestScore = currentScore;
+                        end
+                        moveFood();
+                    end
+                    
+                    if snakeSegments[1].x == deathbox.x and snakeSegments[1].y == deathbox.y then
+                        snakeAlive = false;
+                    end
+
                     table.remove(snakeSegments);
                 end
             else
@@ -171,6 +196,12 @@ function love.draw()
 
     love.graphics.setColor(1, 0, 0); -- food colour
     drawCell(foodPosition.x, foodPosition.y);
+
+    love.graphics.setColor(111, 0, 333);
+    drawCell(extraFood.x, extraFood.y);
+
+    love.graphics.setColor(999, 999, 999);
+    drawCell(deathbox.x, deathbox.y);
     
     drawGUI();
 end
@@ -210,8 +241,8 @@ function drawGUI()
   font = love.graphics.newFont(15); -- font size+
   love.graphics.setFont(font);
   
-  love.graphics.print("Score: " .. tostring(0), 50, 425);
+  love.graphics.print("Score: " .. tostring(currentScore), 50, 425);
   love.graphics.print("Timer: " .. tostring(0), 270, 425);
-  love.graphics.print("Best Score: " .. tostring(0), 450, 425);
+  love.graphics.print("Best Score: " .. tostring(bestScore), 450, 425);
   
   end
